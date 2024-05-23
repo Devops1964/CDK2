@@ -1,0 +1,7 @@
+README.md
+setup.py
+cicdvpcecs/cicdvpcecs.egg-info/PKG-INFO
+cicdvpcecs/cicdvpcecs.egg-info/SOURCES.txt
+cicdvpcecs/cicdvpcecs.egg-info/dependency_links.txt
+cicdvpcecs/cicdvpcecs.egg-info/requires.txt
+cicdvpcecs/cicdvpcecs.egg-info/top_level.txt
