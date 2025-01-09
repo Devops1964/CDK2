@@ -23,7 +23,7 @@
     "container_port": 80,
     "github": {
       "owner": "Devops1964",
-      "repo": "automate-aws-pipeline-microservice",
+      "repo": "CDK2",
       "branch": "main",
       "token_secret": "github-token"
     }

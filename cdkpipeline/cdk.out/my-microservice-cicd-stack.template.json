@@ -1398,7 +1398,7 @@
         },
         "Configuration": {
          "Owner": "Devops1964",
-         "Repo": "automate-aws-pipeline-microservice",
+         "Repo": "CDK2",
          "Branch": "main",
          "OAuthToken": {
           "Fn::Join": [
