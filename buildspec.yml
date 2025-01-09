@@ -1,0 +1,44 @@
+version: "0.2"
+
+env:
+  variables:
+    DOCKER_USERNAME: "imadomar64" # Replace with your Docker Hub username
+    DOCKER_PASSWORD: "Aidarawan11@" # Replace with your Docker Hub password or token
+  shell: /bin/bash # Use Bash explicitly for compatibility with commands
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - apt-get update && apt-get install -y jq awscli
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - echo "Logging in to Docker Hub..."
+      - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+      - echo "Setting up build environment..."
+      - export COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - export IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo "Commit hash is $COMMIT_HASH"
+      - echo "Tagging image with $IMAGE_TAG"
+  build:
+    commands:
+      - echo "Build started on `date`"
+      - docker build -t $REPOSITORY_URI:latest -f ./starter-code/Dockerfile ./starter-code
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+    
+  post_build:
+    commands:
+      - echo "Pushing Docker images..."
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Generating imagedefinitions.json..."
+      - printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo "Cleaning up..."
+      - docker rmi $REPOSITORY_URI:latest
+      - docker rmi $REPOSITORY_URI:$IMAGE_TAG
+
+artifacts:
+  files:
+    - imagedefinitions.json
