@@ -55,7 +55,7 @@ class CdkpipelineStack(Stack):
             ],
         )
 
-        # Create CodeBuild project
+        # Create CodeBuild project with an external buildspec.yml
         codebuild_project = codebuild.PipelineProject(
             self,
             f"{microservice_name}-codebuild-id",
@@ -63,56 +63,7 @@ class CdkpipelineStack(Stack):
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,  # Supports Docker
                 privileged=True,  # Required for Docker builds
             ),
-            environment_variables={
-                "REPOSITORY_URI": codebuild.BuildEnvironmentVariable(
-                    value=ecr_repo.repository_uri
-                )
-            },
-            build_spec=codebuild.BuildSpec.from_object({
-                "version": "0.2",
-                "phases": {
-                    "install": {
-                        "commands": [
-                            "echo Installing dependencies...",
-                            "apt-get update && apt-get install -y jq"
-                        ]
-                    },
-                    "pre_build": {
-                        "commands": [
-                            "echo Logging in to Amazon ECR...",
-                            "$(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 529088253053.dkr.ecr.eu-central-1.amazonaws.com/my-microservice)",
-                            "COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)",
-                            "IMAGE_TAG=${COMMIT_HASH:=latest}",
-                            "echo Commit hash is $COMMIT_HASH",
-                            "echo Tagging image with $IMAGE_TAG",
-                        ]
-                    },
-                    "build": {
-                        "commands": [
-                            "echo Build started on `date`",
-                            "docker build -t $REPOSITORY_URI:latest .",
-                            "docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG",
-                            "echo Running unit tests...",
-                            "./run-tests.sh",
-                        ]
-                    },
-                    "post_build": {
-                        "commands": [
-                            "echo Pushing Docker images...",
-                            "docker push $REPOSITORY_URI:latest",
-                            "docker push $REPOSITORY_URI:$IMAGE_TAG",
-                            "echo Generating imagedefinitions.json...",
-                            "printf '[{\"name\":\"app\",\"imageUri\":\"%s\"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json",
-                            "echo Cleaning up...",
-                            "docker rmi $REPOSITORY_URI:latest",
-                            "docker rmi $REPOSITORY_URI:$IMAGE_TAG",
-                        ]
-                    }
-                },
-                "artifacts": {
-                    "files": ["imagedefinitions.json"]
-                }
-            }),
+            build_spec=codebuild.BuildSpec.from_source_filename("buildspec.yml"),
         )
         ecr_repo.grant_pull_push(codebuild_project)
 
