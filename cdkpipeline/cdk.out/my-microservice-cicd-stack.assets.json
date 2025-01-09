@@ -1,0 +1,20 @@
+{
+  "version": "39.0.0",
+  "files": {
+    "875dddd00c122b42de48026fa1682d53ae13b79dfd1ac75f66c0d403a6ac77d8": {
+      "source": {
+        "path": "my-microservice-cicd-stack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "529088253053-eu-central-1": {
+          "bucketName": "cdk-hnb659fds-assets-529088253053-eu-central-1",
+          "objectKey": "875dddd00c122b42de48026fa1682d53ae13b79dfd1ac75f66c0d403a6ac77d8.json",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::529088253053:role/cdk-hnb659fds-file-publishing-role-529088253053-eu-central-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

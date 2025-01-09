@@ -1,0 +1,8 @@
+{
+    "EcsSgProdId": "sg-06f0ba482bc31458a",
+    "EcsNonProdName": "cicd-ecs-nonprod",
+    "EcsProdName": "cicd-ecs-prod",
+    "VpcNonProdId": "vpc-034e913e5b810b62a",
+    "VpcProdId": "vpc-04240d7fff19a700e",
+    "EcsSgNonProdId": "sg-0e43248f112f98fa7"
+}

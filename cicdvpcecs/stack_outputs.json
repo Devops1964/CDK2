@@ -1,0 +1,32 @@
+[
+    {
+        "OutputKey": "EcsSgProdId",
+        "OutputValue": "sg-06f0ba482bc31458a",
+        "Description": "Prod ECS SG ID"
+    },
+    {
+        "OutputKey": "EcsNonProdName",
+        "OutputValue": "cicd-ecs-nonprod",
+        "Description": "Non-Prod ECS Cluster Name"
+    },
+    {
+        "OutputKey": "EcsProdName",
+        "OutputValue": "cicd-ecs-prod",
+        "Description": "Prod ECS Cluster Name"
+    },
+    {
+        "OutputKey": "VpcNonProdId",
+        "OutputValue": "vpc-034e913e5b810b62a",
+        "Description": "VPC ID for Non-Production"
+    },
+    {
+        "OutputKey": "VpcProdId",
+        "OutputValue": "vpc-04240d7fff19a700e",
+        "Description": "VPC ID for Production"
+    },
+    {
+        "OutputKey": "EcsSgNonProdId",
+        "OutputValue": "sg-0e43248f112f98fa7",
+        "Description": "Non-Prod ECS SG ID"
+    }
+]

@@ -1,0 +1,1799 @@
+{
+ "Resources": {
+  "mymicroserviceecrrepoid7980A577": {
+   "Type": "AWS::ECR::Repository",
+   "Properties": {
+    "RepositoryName": "my-microservice"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecrrepo-id/Resource"
+   }
+  },
+  "mymicroserviceecsroleid6C4A1C83": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecsrole-id/Resource"
+   }
+  },
+  "mymicroserviceecsroleidDefaultPolicy9CD2A00D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroserviceecsfargateidTaskDefappLogGroup17DB017E",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mymicroserviceecsroleidDefaultPolicy9CD2A00D",
+    "Roles": [
+     {
+      "Ref": "mymicroserviceecsroleid6C4A1C83"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecsrole-id/DefaultPolicy/Resource"
+   }
+  },
+  "mymicroservicecodebuildidRole8DD6BA2A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codebuild.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-codebuild-id/Role/Resource"
+   }
+  },
+  "mymicroservicecodebuildidRoleDefaultPolicy0E920B00": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":logs:eu-central-1:529088253053:log-group:/aws/codebuild/",
+           {
+            "Ref": "mymicroservicecodebuildid9FB71BDB"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":logs:eu-central-1:529088253053:log-group:/aws/codebuild/",
+           {
+            "Ref": "mymicroservicecodebuildid9FB71BDB"
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "codebuild:CreateReportGroup",
+        "codebuild:CreateReport",
+        "codebuild:UpdateReport",
+        "codebuild:BatchPutTestCases",
+        "codebuild:BatchPutCodeCoverages"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":codebuild:eu-central-1:529088253053:report-group/",
+          {
+           "Ref": "mymicroservicecodebuildid9FB71BDB"
+          },
+          "-*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:CompleteLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroserviceecrrepoid7980A577",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mymicroservicecodebuildidRoleDefaultPolicy0E920B00",
+    "Roles": [
+     {
+      "Ref": "mymicroservicecodebuildidRole8DD6BA2A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-codebuild-id/Role/DefaultPolicy/Resource"
+   }
+  },
+  "mymicroservicecodebuildid9FB71BDB": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": {
+     "Fn::GetAtt": [
+      "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+      "Arn"
+     ]
+    },
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "REPOSITORY_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "mymicroserviceecrrepoid7980A577",
+                "Arn"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "mymicroserviceecrrepoid7980A577",
+                "Arn"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Ref": "mymicroserviceecrrepoid7980A577"
+          }
+         ]
+        ]
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:5.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "mymicroservicecodebuildidRole8DD6BA2A",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"echo Installing dependencies...\",\n        \"apt-get update && apt-get install -y jq\"\n      ]\n    },\n    \"pre_build\": {\n      \"commands\": [\n        \"echo Logging in to Amazon ECR...\",\n        \"$(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 529088253053.dkr.ecr.eu-central-1.amazonaws.com/my-microservice)\",\n        \"COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)\",\n        \"IMAGE_TAG=${COMMIT_HASH:=latest}\",\n        \"echo Commit hash is $COMMIT_HASH\",\n        \"echo Tagging image with $IMAGE_TAG\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"echo Build started on `date`\",\n        \"docker build -t $REPOSITORY_URI:latest .\",\n        \"docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG\",\n        \"echo Running unit tests...\",\n        \"./run-tests.sh\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"echo Pushing Docker images...\",\n        \"docker push $REPOSITORY_URI:latest\",\n        \"docker push $REPOSITORY_URI:$IMAGE_TAG\",\n        \"echo Generating imagedefinitions.json...\",\n        \"printf '[{\\\"name\\\":\\\"app\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json\",\n        \"echo Cleaning up...\",\n        \"docker rmi $REPOSITORY_URI:latest\",\n        \"docker rmi $REPOSITORY_URI:$IMAGE_TAG\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"files\": [\n      \"imagedefinitions.json\"\n    ]\n  }\n}",
+     "Type": "CODEPIPELINE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-codebuild-id/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidLB5B8CC3A8": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "mymicroserviceecsfargateidLBSecurityGroupAF0D9346",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     {
+      "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1Subnet3C273B99"
+     },
+     {
+      "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2Subnet95FF715A"
+     }
+    ],
+    "Type": "application"
+   },
+   "DependsOn": [
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1DefaultRouteFF4E2178",
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableAssociation8B583A17",
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2DefaultRouteB1375520",
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTableAssociation43E5803C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidLBSecurityGroupAF0D9346": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB mymicroservicecicdstackmymicroserviceecsfargateidLBDE795143",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/SecurityGroup/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidLBSecurityGrouptomymicroservicecicdstackmymicroserviceecsfargateidServiceSecurityGroup4C93B9D6809F11DA30": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsfargateidServiceSecurityGroup017DE029",
+      "GroupId"
+     ]
+    },
+    "FromPort": 80,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsfargateidLBSecurityGroupAF0D9346",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/SecurityGroup/to mymicroservicecicdstackmymicroserviceecsfargateidServiceSecurityGroup4C93B9D6:80"
+   }
+  },
+  "mymicroserviceecsfargateidLBPublicListener5AE36A85": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "mymicroserviceecsfargateidLBPublicListenerECSGroupBC95D56F"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "mymicroserviceecsfargateidLB5B8CC3A8"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/PublicListener/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidLBPublicListenerECSGroupBC95D56F": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "Port": 80,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/PublicListener/ECSGroup/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidTaskDefTaskRole31448546": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/TaskRole/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidTaskDefBA75F74D": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Essential": true,
+      "Image": "public.ecr.aws/nginx/nginx:1.25-bookworm",
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "mymicroserviceecsfargateidTaskDefappLogGroup17DB017E"
+        },
+        "awslogs-stream-prefix": "my-microservice-ecs-fargate-id",
+        "awslogs-region": "eu-central-1"
+       }
+      },
+      "Name": "app",
+      "PortMappings": [
+       {
+        "ContainerPort": 80,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "256",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsroleid6C4A1C83",
+      "Arn"
+     ]
+    },
+    "Family": "mymicroservicecicdstackmymicroserviceecsfargateidTaskDef7E6E7CE2",
+    "Memory": "512",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsfargateidTaskDefTaskRole31448546",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidTaskDefappLogGroup17DB017E": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/app/LogGroup/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidService69DF2BEA": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "EcsDefaultClusterMnL3mNNYN926A5246"
+    },
+    "DeploymentConfiguration": {
+     "Alarms": {
+      "AlarmNames": [],
+      "Enable": false,
+      "Rollback": false
+     },
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 2,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "app",
+      "ContainerPort": 80,
+      "TargetGroupArn": {
+       "Ref": "mymicroserviceecsfargateidLBPublicListenerECSGroupBC95D56F"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "mymicroserviceecsfargateidServiceSecurityGroup017DE029",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1Subnet075EFF4C"
+       },
+       {
+        "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2SubnetE4CEDF73"
+       }
+      ]
+     }
+    },
+    "ServiceName": "my-microservice",
+    "TaskDefinition": {
+     "Ref": "mymicroserviceecsfargateidTaskDefBA75F74D"
+    }
+   },
+   "DependsOn": [
+    "mymicroserviceecsfargateidLBPublicListenerECSGroupBC95D56F",
+    "mymicroserviceecsfargateidLBPublicListener5AE36A85",
+    "mymicroserviceecsfargateidTaskDefTaskRole31448546"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/Service"
+   }
+  },
+  "mymicroserviceecsfargateidServiceSecurityGroup017DE029": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "DependsOn": [
+    "mymicroserviceecsfargateidTaskDefTaskRole31448546"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/SecurityGroup/Resource"
+   }
+  },
+  "mymicroserviceecsfargateidServiceSecurityGroupfrommymicroservicecicdstackmymicroserviceecsfargateidLBSecurityGroup060EDAC180E47B3296": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "FromPort": 80,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsfargateidServiceSecurityGroup017DE029",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "mymicroserviceecsfargateidLBSecurityGroupAF0D9346",
+      "GroupId"
+     ]
+    },
+    "ToPort": 80
+   },
+   "DependsOn": [
+    "mymicroserviceecsfargateidTaskDefTaskRole31448546"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/SecurityGroup/from mymicroservicecicdstackmymicroserviceecsfargateidLBSecurityGroup060EDAC1:80"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYN926A5246": {
+   "Type": "AWS::ECS::Cluster",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Resource"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpc7788A521": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/Resource"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1Subnet3C273B99": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1a",
+    "CidrBlock": "10.0.0.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/Subnet"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableA1FD6ACC": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/RouteTable"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableAssociation8B583A17": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableA1FD6ACC"
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1Subnet3C273B99"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1DefaultRouteFF4E2178": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcIGW9C2C2B8F"
+    },
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableA1FD6ACC"
+    }
+   },
+   "DependsOn": [
+    "EcsDefaultClusterMnL3mNNYNVpcVPCGW2447264E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1EIP8704DB2F": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/EIP"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1NATGateway5E3732C1": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1EIP8704DB2F",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1Subnet3C273B99"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1"
+     }
+    ]
+   },
+   "DependsOn": [
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1DefaultRouteFF4E2178",
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableAssociation8B583A17"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/NATGateway"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2Subnet95FF715A": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1b",
+    "CidrBlock": "10.0.64.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/Subnet"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTable263DEAA5": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/RouteTable"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTableAssociation43E5803C": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTable263DEAA5"
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2Subnet95FF715A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2DefaultRouteB1375520": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcIGW9C2C2B8F"
+    },
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTable263DEAA5"
+    }
+   },
+   "DependsOn": [
+    "EcsDefaultClusterMnL3mNNYNVpcVPCGW2447264E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2EIPF0764873": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/EIP"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2NATGateway4C855E00": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2EIPF0764873",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2Subnet95FF715A"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2"
+     }
+    ]
+   },
+   "DependsOn": [
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2DefaultRouteB1375520",
+    "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTableAssociation43E5803C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/NATGateway"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1Subnet075EFF4C": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1a",
+    "CidrBlock": "10.0.128.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/Subnet"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTable4F1D2E36": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/RouteTable"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTableAssociation34B92275": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTable4F1D2E36"
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1Subnet075EFF4C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/RouteTableAssociation"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1DefaultRouteA5ADF694": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1NATGateway5E3732C1"
+    },
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTable4F1D2E36"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/DefaultRoute"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2SubnetE4CEDF73": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "eu-central-1b",
+    "CidrBlock": "10.0.192.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/Subnet"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableDCE46591": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/RouteTable"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableAssociation111C622F": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableDCE46591"
+    },
+    "SubnetId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2SubnetE4CEDF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/RouteTableAssociation"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2DefaultRoute20CE2D89": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2NATGateway4C855E00"
+    },
+    "RouteTableId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableDCE46591"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/DefaultRoute"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcIGW9C2C2B8F": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/IGW"
+   }
+  },
+  "EcsDefaultClusterMnL3mNNYNVpcVPCGW2447264E": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpcIGW9C2C2B8F"
+    },
+    "VpcId": {
+     "Ref": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/VPCGW"
+   }
+  },
+  "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       },
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucketEncryptionKey/Resource"
+   }
+  },
+  "mymicroservicepipelineidArtifactsBucketEncryptionKeyAlias887F0C32": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/codepipeline-mymicroservicecicdstackmymicroservicepipelineidc0814592",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+      "Arn"
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucketEncryptionKeyAlias/Resource"
+   }
+  },
+  "mymicroservicepipelineidArtifactsBucket5C7ADC78": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucket/Resource"
+   }
+  },
+  "mymicroservicepipelineidArtifactsBucketPolicyB26455EC": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "mymicroservicepipelineidArtifactsBucket5C7ADC78"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucket/Policy/Resource"
+   }
+  },
+  "mymicroservicepipelineidRoleDDC25B2C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codepipeline.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Role/Resource"
+   }
+  },
+  "mymicroservicepipelineidRoleDefaultPolicy0E7EBA24": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRole7DC0421C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidDeployECSDeployCodePipelineActionRole1E321133",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mymicroservicepipelineidRoleDefaultPolicy0E7EBA24",
+    "Roles": [
+     {
+      "Ref": "mymicroservicepipelineidRoleDDC25B2C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Role/DefaultPolicy/Resource"
+   }
+  },
+  "mymicroservicepipelineid1FE405DC": {
+   "Type": "AWS::CodePipeline::Pipeline",
+   "Properties": {
+    "ArtifactStore": {
+     "EncryptionKey": {
+      "Id": {
+       "Fn::GetAtt": [
+        "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+        "Arn"
+       ]
+      },
+      "Type": "KMS"
+     },
+     "Location": {
+      "Ref": "mymicroservicepipelineidArtifactsBucket5C7ADC78"
+     },
+     "Type": "S3"
+    },
+    "Name": "my-microservice-pipeline",
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "mymicroservicepipelineidRoleDDC25B2C",
+      "Arn"
+     ]
+    },
+    "Stages": [
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Source",
+         "Owner": "ThirdParty",
+         "Provider": "GitHub",
+         "Version": "1"
+        },
+        "Configuration": {
+         "Owner": "Devops1964",
+         "Repo": "automate-aws-pipeline-microservice",
+         "Branch": "main",
+         "OAuthToken": {
+          "Fn::Join": [
+           "",
+           [
+            "{{resolve:secretsmanager:arn:",
+            {
+             "Ref": "AWS::Partition"
+            },
+            ":secretsmanager:eu-central-1:529088253053:secret:github-token:SecretString:::}}"
+           ]
+          ]
+         },
+         "PollForSourceChanges": false
+        },
+        "Name": "GitHub_Source",
+        "OutputArtifacts": [
+         {
+          "Name": "Artifact_Source_GitHub_Source"
+         }
+        ],
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Source"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "mymicroservicecodebuildid9FB71BDB"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "Artifact_Source_GitHub_Source"
+         }
+        ],
+        "Name": "CodeBuild",
+        "OutputArtifacts": [
+         {
+          "Name": "BuildOutput"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRole7DC0421C",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Build"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Deploy",
+         "Owner": "AWS",
+         "Provider": "ECS",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ClusterName": {
+          "Ref": "EcsDefaultClusterMnL3mNNYN926A5246"
+         },
+         "ServiceName": {
+          "Fn::GetAtt": [
+           "mymicroserviceecsfargateidService69DF2BEA",
+           "Name"
+          ]
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "BuildOutput"
+         }
+        ],
+        "Name": "ECS_Deploy",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidDeployECSDeployCodePipelineActionRole1E321133",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Deploy"
+     }
+    ]
+   },
+   "DependsOn": [
+    "mymicroservicepipelineidRoleDefaultPolicy0E7EBA24",
+    "mymicroservicepipelineidRoleDDC25B2C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Resource"
+   }
+  },
+  "mymicroservicepipelineidSourceGitHubSourceWebhookResource2C77FA34": {
+   "Type": "AWS::CodePipeline::Webhook",
+   "Properties": {
+    "Authentication": "GITHUB_HMAC",
+    "AuthenticationConfiguration": {
+     "SecretToken": {
+      "Fn::Join": [
+       "",
+       [
+        "{{resolve:secretsmanager:arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":secretsmanager:eu-central-1:529088253053:secret:github-token:SecretString:::}}"
+       ]
+      ]
+     }
+    },
+    "Filters": [
+     {
+      "JsonPath": "$.ref",
+      "MatchEquals": "refs/heads/{Branch}"
+     }
+    ],
+    "RegisterWithThirdParty": true,
+    "TargetAction": "GitHub_Source",
+    "TargetPipeline": {
+     "Ref": "mymicroservicepipelineid1FE405DC"
+    },
+    "TargetPipelineVersion": 1
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Source/GitHub_Source/WebhookResource"
+   }
+  },
+  "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRole7DC0421C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Build/CodeBuild/CodePipelineActionRole/Resource"
+   }
+  },
+  "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRoleDefaultPolicy5A027787": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicecodebuildid9FB71BDB",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRoleDefaultPolicy5A027787",
+    "Roles": [
+     {
+      "Ref": "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRole7DC0421C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Build/CodeBuild/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "mymicroservicepipelineidDeployECSDeployCodePipelineActionRole1E321133": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Deploy/ECS_Deploy/CodePipelineActionRole/Resource"
+   }
+  },
+  "mymicroservicepipelineidDeployECSDeployCodePipelineActionRoleDefaultPolicy68EEB709": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+        "ecs:TagResource",
+        "ecs:UpdateService"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringEqualsIfExists": {
+         "iam:PassedToService": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "mymicroservicepipelineidArtifactsBucket5C7ADC78",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "mymicroservicepipelineidDeployECSDeployCodePipelineActionRoleDefaultPolicy68EEB709",
+    "Roles": [
+     {
+      "Ref": "mymicroservicepipelineidDeployECSDeployCodePipelineActionRole1E321133"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/my-microservice-pipeline-id/Deploy/ECS_Deploy/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31T0W7bMAz8lr4rGpIM2HPadUWwYjOSoHssaJl1WCuSIVEJAsH/PkhyEq8b9sTj6WzRd/RCzr98lvM7OPmZarqZplrGLYPqxAa9DU6hgJN/jaicjBvsrSe27iwe3sytGwTBQcaN1ZgPUq2sJpV1BQ1C2QbrQLqRsaIeNRmsnH1HxVlV4CBQ+dcemNEZL1d9r0kBkzXPFpp70GAUNt/AtcC4RXckhQI1eCalLTR1VpBpjwsZ//20S9f90U915BnNqLngyfkOXIv85Gzok2TSpskXMm5RBUd8vkr+Tzy2Dr3/i16bwr/0Kp29VA+iCrUmtQ21wWzYDW1sYNxBXdwv/I1beW8V5eGv4gQe11UqP4CfgPEEZ1E5OiZXry9em5QCXgVlkrFbMYPaH9CUzGQcQ9mB777iGxm6XPmRsYaBDLoJ9yHQbMcIdfBc8hjhILRtvYzPtr16esFly/pxvW6Lljdsgn9hvbe2G0R38DJ+x/xtqaw0QY4jg0H4pYz3QXXFkBGVctvwaT8MifkZuA8lnPE3GkR15r01n5ZyvpTzu3dPNHPBMB1Qbkr9DQmiIkGOAwAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "my-microservice-cicd-stack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "mymicroserviceecsfargateidLoadBalancerDNSCA4A542A": {
+   "Value": {
+    "Fn::GetAtt": [
+     "mymicroserviceecsfargateidLB5B8CC3A8",
+     "DNSName"
+    ]
+   }
+  },
+  "mymicroserviceecsfargateidServiceURL823C04E9": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "mymicroserviceecsfargateidLB5B8CC3A8",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

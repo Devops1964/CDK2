@@ -1,0 +1,2092 @@
+{
+ "Resources": {
+  "myservice1codecommitid": {
+   "Type": "AWS::CodeCommit::Repository",
+   "Properties": {
+    "RepositoryName": "myservice1",
+    "Code": {
+     "BranchName": "master",
+     "S3": {
+      "Bucket": "rag98765",
+      "Key": "starter-code.zip"
+     }
+    },
+    "RepositoryDescription": "Repository for myservice1"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codecommit-id"
+   }
+  },
+  "Repositorymyservice1cicdstackmyservice1codepipelineid59A8012AEventRuleCA94B124": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "EventPattern": {
+     "source": [
+      "aws.codecommit"
+     ],
+     "resources": [
+      {
+       "Fn::Join": [
+        "",
+        [
+         "arn:",
+         {
+          "Ref": "AWS::Partition"
+         },
+         ":codecommit:eu-central-1:529088253053:myservice1"
+        ]
+       ]
+      }
+     ],
+     "detail-type": [
+      "CodeCommit Repository State Change"
+     ],
+     "detail": {
+      "event": [
+       "referenceCreated",
+       "referenceUpdated"
+      ],
+      "referenceName": [
+       "master"
+      ]
+     }
+    },
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::Join": [
+        "",
+        [
+         "arn:",
+         {
+          "Ref": "AWS::Partition"
+         },
+         ":codepipeline:eu-central-1:529088253053:",
+         {
+          "Ref": "myservice1codepipelineid3440EEA3"
+         }
+        ]
+       ]
+      },
+      "Id": "Target0",
+      "RoleArn": {
+       "Fn::GetAtt": [
+        "myservice1codepipelineidEventsRoleD3B47D36",
+        "Arn"
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/Repository/myservice1cicdstackmyservice1codepipelineid59A8012AEventRule/Resource"
+   }
+  },
+  "myservice1ecrrepoid18FA0EB0": {
+   "Type": "AWS::ECR::Repository",
+   "Properties": {
+    "RepositoryName": "myservice1"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecrrepo-id/Resource"
+   }
+  },
+  "myservice1ecsroleid9409AD61": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+       ]
+      ]
+     }
+    ],
+    "RoleName": "myservice1-ecs-taskexecution-role"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1ecsrole-id/Resource"
+   }
+  },
+  "myservice1ecsroleidDefaultPolicyA61AEAC5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1ecsfargateidTaskDefappLogGroup630F3F0B",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1prodecsfargateidTaskDefappLogGroup6324DE10",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1ecsroleidDefaultPolicyA61AEAC5",
+    "Roles": [
+     {
+      "Ref": "myservice1ecsroleid9409AD61"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1ecsrole-id/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1ecsfargateidLB7C17168C": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "myservice1ecsfargateidLBSecurityGroup67F7B3B4",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     "subnet-0b0ca93ddba488ef9",
+     "subnet-020d0398756154b90"
+    ],
+    "Type": "application"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/LB/Resource"
+   }
+  },
+  "myservice1ecsfargateidLBSecurityGroup67F7B3B4": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB myservice1cicdstackmyservice1ecsfargateidLBB430D8CF",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "VpcId": "vpc-00cee88fa18831b64"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/LB/SecurityGroup/Resource"
+   }
+  },
+  "myservice1ecsfargateidLBSecurityGrouptomyservice1cicdstackmyservice1ecsfargateidServiceSecurityGroup3395AA3180FE55A91D": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "GroupId": {
+     "Fn::GetAtt": [
+      "myservice1ecsfargateidLBSecurityGroup67F7B3B4",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "myservice1ecsfargateidServiceSecurityGroupBD392586",
+      "GroupId"
+     ]
+    },
+    "FromPort": 80,
+    "ToPort": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/LB/SecurityGroup/to myservice1cicdstackmyservice1ecsfargateidServiceSecurityGroup3395AA31:80"
+   }
+  },
+  "myservice1ecsfargateidLBPublicListener5CD5AB70": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "myservice1ecsfargateidLBPublicListenerECSGroup3613E649"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "myservice1ecsfargateidLB7C17168C"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/LB/PublicListener/Resource"
+   }
+  },
+  "myservice1ecsfargateidLBPublicListenerECSGroup3613E649": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "Port": 80,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "VpcId": "vpc-00cee88fa18831b64"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/LB/PublicListener/ECSGroup/Resource"
+   }
+  },
+  "myservice1ecsfargateidTaskDefTaskRole36129FED": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/TaskDef/TaskRole/Resource"
+   }
+  },
+  "myservice1ecsfargateidTaskDef02CC137A": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Essential": true,
+      "Image": "public.ecr.aws/nginx/nginx:1.25-bookworm",
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "myservice1ecsfargateidTaskDefappLogGroup630F3F0B"
+        },
+        "awslogs-stream-prefix": "myservice1-ecs-fargate-id",
+        "awslogs-region": "eu-central-1"
+       }
+      },
+      "Name": "app",
+      "PortMappings": [
+       {
+        "ContainerPort": 80,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "256",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "myservice1ecsroleid9409AD61",
+      "Arn"
+     ]
+    },
+    "Family": "myservice1cicdstackmyservice1ecsfargateidTaskDefBDA075BB",
+    "Memory": "512",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "myservice1ecsfargateidTaskDefTaskRole36129FED",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/TaskDef/Resource"
+   }
+  },
+  "myservice1ecsfargateidTaskDefappLogGroup630F3F0B": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/TaskDef/app/LogGroup/Resource"
+   }
+  },
+  "myservice1ecsfargateidService7F9A4B99": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": "cicd-ecs-nonprod",
+    "DeploymentConfiguration": {
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 2,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "app",
+      "ContainerPort": 80,
+      "TargetGroupArn": {
+       "Ref": "myservice1ecsfargateidLBPublicListenerECSGroup3613E649"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "myservice1ecsfargateidServiceSecurityGroupBD392586",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       "subnet-049ddf4c1ab7e7c9c",
+       "subnet-0c981f4cb9a29c74b"
+      ]
+     }
+    },
+    "ServiceName": "myservice1",
+    "TaskDefinition": {
+     "Ref": "myservice1ecsfargateidTaskDef02CC137A"
+    }
+   },
+   "DependsOn": [
+    "myservice1ecsfargateidLBPublicListenerECSGroup3613E649",
+    "myservice1ecsfargateidLBPublicListener5CD5AB70"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/Service/Service"
+   }
+  },
+  "myservice1ecsfargateidServiceSecurityGroupBD392586": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "myservice1-cicd-stack/myservice1-ecs-fargate-id/Service/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": "vpc-00cee88fa18831b64"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/Service/SecurityGroup/Resource"
+   }
+  },
+  "myservice1ecsfargateidServiceSecurityGroupfrommyservice1cicdstackmyservice1ecsfargateidLBSecurityGroup2A764AB780307CE980": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "IpProtocol": "tcp",
+    "Description": "Load balancer to target",
+    "FromPort": 80,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "myservice1ecsfargateidServiceSecurityGroupBD392586",
+      "GroupId"
+     ]
+    },
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "myservice1ecsfargateidLBSecurityGroup67F7B3B4",
+      "GroupId"
+     ]
+    },
+    "ToPort": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-ecs-fargate-id/Service/SecurityGroup/from myservice1cicdstackmyservice1ecsfargateidLBSecurityGroup2A764AB7:80"
+   }
+  },
+  "myservice1prodecsfargateidLB71DBBE0F": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "myservice1prodecsfargateidLBSecurityGroup4970E236",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     "subnet-0ffd1c71899c0f22d",
+     "subnet-017e307da9e43c0b7"
+    ],
+    "Type": "application"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/LB/Resource"
+   }
+  },
+  "myservice1prodecsfargateidLBSecurityGroup4970E236": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB myservice1cicdstackmyservice1prodecsfargateidLB795D97B8",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "VpcId": "vpc-04811e5eb77f9396a"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/LB/SecurityGroup/Resource"
+   }
+  },
+  "myservice1prodecsfargateidLBSecurityGrouptomyservice1cicdstackmyservice1prodecsfargateidServiceSecurityGroup1EA0F1BB8099690873": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "GroupId": {
+     "Fn::GetAtt": [
+      "myservice1prodecsfargateidLBSecurityGroup4970E236",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "myservice1prodecsfargateidServiceSecurityGroup851303D4",
+      "GroupId"
+     ]
+    },
+    "FromPort": 80,
+    "ToPort": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/LB/SecurityGroup/to myservice1cicdstackmyservice1prodecsfargateidServiceSecurityGroup1EA0F1BB:80"
+   }
+  },
+  "myservice1prodecsfargateidLBPublicListenerD532C879": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "myservice1prodecsfargateidLBPublicListenerECSGroup6B0F18A6"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "myservice1prodecsfargateidLB71DBBE0F"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/LB/PublicListener/Resource"
+   }
+  },
+  "myservice1prodecsfargateidLBPublicListenerECSGroup6B0F18A6": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "Port": 80,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "VpcId": "vpc-04811e5eb77f9396a"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/LB/PublicListener/ECSGroup/Resource"
+   }
+  },
+  "myservice1prodecsfargateidTaskDefTaskRole171FFEFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/TaskDef/TaskRole/Resource"
+   }
+  },
+  "myservice1prodecsfargateidTaskDef2ADBE1A4": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Essential": true,
+      "Image": "public.ecr.aws/nginx/nginx:1.25-bookworm",
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "myservice1prodecsfargateidTaskDefappLogGroup6324DE10"
+        },
+        "awslogs-stream-prefix": "myservice1-prod-ecs-fargate-id",
+        "awslogs-region": "eu-central-1"
+       }
+      },
+      "Name": "app",
+      "PortMappings": [
+       {
+        "ContainerPort": 80,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "256",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "myservice1ecsroleid9409AD61",
+      "Arn"
+     ]
+    },
+    "Family": "myservice1cicdstackmyservice1prodecsfargateidTaskDefD1EB4A27",
+    "Memory": "512",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "myservice1prodecsfargateidTaskDefTaskRole171FFEFB",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/TaskDef/Resource"
+   }
+  },
+  "myservice1prodecsfargateidTaskDefappLogGroup6324DE10": {
+   "Type": "AWS::Logs::LogGroup",
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/TaskDef/app/LogGroup/Resource"
+   }
+  },
+  "myservice1prodecsfargateidService6845DADD": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": "cicd-ecs-prod",
+    "DeploymentConfiguration": {
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 2,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "app",
+      "ContainerPort": 80,
+      "TargetGroupArn": {
+       "Ref": "myservice1prodecsfargateidLBPublicListenerECSGroup6B0F18A6"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "myservice1prodecsfargateidServiceSecurityGroup851303D4",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       "subnet-0e4cdbd625f6a79f9",
+       "subnet-02a04f46edcf1473c"
+      ]
+     }
+    },
+    "ServiceName": "myservice1",
+    "TaskDefinition": {
+     "Ref": "myservice1prodecsfargateidTaskDef2ADBE1A4"
+    }
+   },
+   "DependsOn": [
+    "myservice1prodecsfargateidLBPublicListenerECSGroup6B0F18A6",
+    "myservice1prodecsfargateidLBPublicListenerD532C879"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/Service/Service"
+   }
+  },
+  "myservice1prodecsfargateidServiceSecurityGroup851303D4": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/Service/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": "vpc-04811e5eb77f9396a"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/Service/SecurityGroup/Resource"
+   }
+  },
+  "myservice1prodecsfargateidServiceSecurityGroupfrommyservice1cicdstackmyservice1prodecsfargateidLBSecurityGroup679DB64880E8C81608": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "IpProtocol": "tcp",
+    "Description": "Load balancer to target",
+    "FromPort": 80,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "myservice1prodecsfargateidServiceSecurityGroup851303D4",
+      "GroupId"
+     ]
+    },
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "myservice1prodecsfargateidLBSecurityGroup4970E236",
+      "GroupId"
+     ]
+    },
+    "ToPort": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-prod-ecs-fargate-id/Service/SecurityGroup/from myservice1cicdstackmyservice1prodecsfargateidLBSecurityGroup679DB648:80"
+   }
+  },
+  "myservice1codebuildidRole6A4D7BB1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codebuild.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codebuild-id/Role/Resource"
+   }
+  },
+  "myservice1codebuildidRoleDefaultPolicy066C9496": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":logs:eu-central-1:529088253053:log-group:/aws/codebuild/",
+           {
+            "Ref": "myservice1codebuildidEB3FE62B"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":logs:eu-central-1:529088253053:log-group:/aws/codebuild/",
+           {
+            "Ref": "myservice1codebuildidEB3FE62B"
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "codebuild:CreateReportGroup",
+        "codebuild:CreateReport",
+        "codebuild:UpdateReport",
+        "codebuild:BatchPutTestCases",
+        "codebuild:BatchPutCodeCoverages"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":codebuild:eu-central-1:529088253053:report-group/",
+          {
+           "Ref": "myservice1codebuildidEB3FE62B"
+          },
+          "-*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1ecrrepoid18FA0EB0",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "ecr:PutImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1ecrrepoid18FA0EB0",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "codecommit:GitPull",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":codecommit:eu-central-1:529088253053:myservice1"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codebuildidRoleDefaultPolicy066C9496",
+    "Roles": [
+     {
+      "Ref": "myservice1codebuildidRole6A4D7BB1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codebuild-id/Role/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codebuildidEB3FE62B": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "REPOSITORY_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "myservice1ecrrepoid18FA0EB0",
+                "Arn"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "myservice1ecrrepoid18FA0EB0",
+                "Arn"
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Ref": "myservice1ecrrepoid18FA0EB0"
+          }
+         ]
+        ]
+       }
+      }
+     ],
+     "Image": "aws/codebuild/standard:1.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "myservice1codebuildidRole6A4D7BB1",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"build\": {\n      \"commands\": [\n        \"$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)\",\n        \"echo $REPOSITORY_URI\",\n        \"docker build -t $REPOSITORY_URI:latest .\",\n        \"docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"docker push $REPOSITORY_URI:latest\",\n        \"docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION\",\n        \"export imageTag=$CODEBUILD_RESOLVED_SOURCE_VERSION\",\n        \"printf '[{\\\"name\\\":\\\"app\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $REPOSITORY_URI:$imageTag > imagedefinitions.json\"\n      ]\n    }\n  },\n  \"env\": {\n    \"exported-variables\": [\n      \"imageTag\"\n    ]\n  },\n  \"artifacts\": {\n    \"files\": \"imagedefinitions.json\",\n    \"secondary-artifacts\": {\n      \"imagedefinitions\": {\n        \"files\": \"imagedefinitions.json\",\n        \"name\": \"imagedefinitions\"\n      }\n    }\n  }\n}",
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "EncryptionKey": {
+     "Fn::GetAtt": [
+      "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+      "Arn"
+     ]
+    },
+    "Name": "myservice1"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codebuild-id/Resource"
+   }
+  },
+  "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       },
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/ArtifactsBucketEncryptionKey/Resource"
+   }
+  },
+  "myservice1codepipelineidArtifactsBucketEncryptionKeyAliasE59BB759": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/codepipeline-myservice1cicdstackmyservice1codepipelineid59a8012a",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+      "Arn"
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/ArtifactsBucketEncryptionKeyAlias/Resource"
+   }
+  },
+  "myservice1codepipelineidArtifactsBucketBC4CB40D": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/ArtifactsBucket/Resource"
+   }
+  },
+  "myservice1codepipelineidArtifactsBucketPolicyF5D7F9D6": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "myservice1codepipelineidArtifactsBucketBC4CB40D"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/ArtifactsBucket/Policy/Resource"
+   }
+  },
+  "myservice1codepipelineidRole182E1CC1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codepipeline.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Role/Resource"
+   }
+  },
+  "myservice1codepipelineidRoleDefaultPolicy9D275D16": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidSourceCodeCommitCodePipelineActionRole1D34535F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidBuildCodeBuildCodePipelineActionRole09FBDC62",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRole2C5B7B09",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidDeployProdApproveProdDeployCodePipelineActionRole35B2C31C",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRole27B8E667",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidRoleDefaultPolicy9D275D16",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidRole182E1CC1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Role/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codepipelineid3440EEA3": {
+   "Type": "AWS::CodePipeline::Pipeline",
+   "Properties": {
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "myservice1codepipelineidRole182E1CC1",
+      "Arn"
+     ]
+    },
+    "Stages": [
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Source",
+         "Owner": "AWS",
+         "Provider": "CodeCommit",
+         "Version": "1"
+        },
+        "Configuration": {
+         "RepositoryName": "myservice1",
+         "BranchName": "master",
+         "PollForSourceChanges": false,
+         "OutputArtifactFormat": "CODEBUILD_CLONE_REF"
+        },
+        "Name": "CodeCommit",
+        "OutputArtifacts": [
+         {
+          "Name": "Artifact_Source_CodeCommit"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidSourceCodeCommitCodePipelineActionRole1D34535F",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Source"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "myservice1codebuildidEB3FE62B"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "Artifact_Source_CodeCommit"
+         }
+        ],
+        "Name": "CodeBuild",
+        "OutputArtifacts": [
+         {
+          "Name": "imagedefinitions"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidBuildCodeBuildCodePipelineActionRole09FBDC62",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Build"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Deploy",
+         "Owner": "AWS",
+         "Provider": "ECS",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ClusterName": "cicd-ecs-nonprod",
+         "ServiceName": {
+          "Fn::GetAtt": [
+           "myservice1ecsfargateidService7F9A4B99",
+           "Name"
+          ]
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "imagedefinitions"
+         }
+        ],
+        "Name": "DeployECS",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRole2C5B7B09",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Deploy-NonProd"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Approval",
+         "Owner": "AWS",
+         "Provider": "Manual",
+         "Version": "1"
+        },
+        "Name": "Approve-Prod-Deploy",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidDeployProdApproveProdDeployCodePipelineActionRole35B2C31C",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       },
+       {
+        "ActionTypeId": {
+         "Category": "Deploy",
+         "Owner": "AWS",
+         "Provider": "ECS",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ClusterName": "cicd-ecs-prod",
+         "ServiceName": {
+          "Fn::GetAtt": [
+           "myservice1prodecsfargateidService6845DADD",
+           "Name"
+          ]
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "imagedefinitions"
+         }
+        ],
+        "Name": "DeployECS",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRole27B8E667",
+          "Arn"
+         ]
+        },
+        "RunOrder": 2
+       }
+      ],
+      "Name": "Deploy-Prod"
+     }
+    ],
+    "ArtifactStore": {
+     "EncryptionKey": {
+      "Id": {
+       "Fn::GetAtt": [
+        "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+        "Arn"
+       ]
+      },
+      "Type": "KMS"
+     },
+     "Location": {
+      "Ref": "myservice1codepipelineidArtifactsBucketBC4CB40D"
+     },
+     "Type": "S3"
+    },
+    "Name": "myservice1"
+   },
+   "DependsOn": [
+    "myservice1codepipelineidRoleDefaultPolicy9D275D16",
+    "myservice1codepipelineidRole182E1CC1"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Resource"
+   }
+  },
+  "myservice1codepipelineidSourceCodeCommitCodePipelineActionRole1D34535F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Source/CodeCommit/CodePipelineActionRole/Resource"
+   }
+  },
+  "myservice1codepipelineidSourceCodeCommitCodePipelineActionRoleDefaultPolicyAE03184B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "codecommit:GetBranch",
+        "codecommit:GetCommit",
+        "codecommit:UploadArchive",
+        "codecommit:GetUploadArchiveStatus",
+        "codecommit:CancelUploadArchive",
+        "codecommit:GetRepository"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":codecommit:eu-central-1:529088253053:myservice1"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidSourceCodeCommitCodePipelineActionRoleDefaultPolicyAE03184B",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidSourceCodeCommitCodePipelineActionRole1D34535F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Source/CodeCommit/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codepipelineidEventsRoleD3B47D36": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/EventsRole/Resource"
+   }
+  },
+  "myservice1codepipelineidEventsRoleDefaultPolicyA0D6D373": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "codepipeline:StartPipelineExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:",
+          {
+           "Ref": "AWS::Partition"
+          },
+          ":codepipeline:eu-central-1:529088253053:",
+          {
+           "Ref": "myservice1codepipelineid3440EEA3"
+          }
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidEventsRoleDefaultPolicyA0D6D373",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidEventsRoleD3B47D36"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/EventsRole/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codepipelineidBuildCodeBuildCodePipelineActionRole09FBDC62": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Build/CodeBuild/CodePipelineActionRole/Resource"
+   }
+  },
+  "myservice1codepipelineidBuildCodeBuildCodePipelineActionRoleDefaultPolicy5BFEFF64": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codebuildidEB3FE62B",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidBuildCodeBuildCodePipelineActionRoleDefaultPolicy5BFEFF64",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidBuildCodeBuildCodePipelineActionRole09FBDC62"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Build/CodeBuild/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRole2C5B7B09": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Deploy-NonProd/DeployECS/CodePipelineActionRole/Resource"
+   }
+  },
+  "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRoleDefaultPolicy07ABBBA6": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+        "ecs:UpdateService"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringEqualsIfExists": {
+         "iam:PassedToService": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRoleDefaultPolicy07ABBBA6",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidDeployNonProdDeployECSCodePipelineActionRole2C5B7B09"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Deploy-NonProd/DeployECS/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "myservice1codepipelineidDeployProdApproveProdDeployCodePipelineActionRole35B2C31C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Deploy-Prod/Approve-Prod-Deploy/CodePipelineActionRole/Resource"
+   }
+  },
+  "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRole27B8E667": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":iam::529088253053:root"
+          ]
+         ]
+        }
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Deploy-Prod/DeployECS/CodePipelineActionRole/Resource"
+   }
+  },
+  "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRoleDefaultPolicy22FC12A1": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+        "ecs:UpdateService"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringEqualsIfExists": {
+         "iam:PassedToService": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "myservice1codepipelineidArtifactsBucketBC4CB40D",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "myservice1codepipelineidArtifactsBucketBC4CB40D",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "myservice1codepipelineidArtifactsBucketEncryptionKey1F9AD835",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRoleDefaultPolicy22FC12A1",
+    "Roles": [
+     {
+      "Ref": "myservice1codepipelineidDeployProdDeployECSCodePipelineActionRole27B8E667"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/myservice1-codepipeline-id/Deploy-Prod/DeployECS/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31SW04jMRA8C/9OQxIOsDwWhEDaKOECxtMMzXjcI7udVWT57it7JjABtF9VXV398GMJq4tLuDj7pf+GhWm682TYI6SdaNOpLQaO3qC6eXV/ogxR1A27ID4aKdoxn1UpT4YbNNz3JFCTAwcS9geFe3QSIG2jrb0KZoXGQ5q5TmqyIt1D2vJUUXDDlkz1jay0CItBi6B3Aa6GwZLRQuyeWDfX2mpnsLnTvtWCO/R7MqjQ6iBkLOvmpTrItfsVpJ+rfZl2Es99FATd5DnyWf5Z+xbl3nMcimUWls1XkHZooic5fFj+L/xuPYbwTX5wVa+3AWk67rMO3S2+kqOyyTj+VGEnmhz6mfblquqgSrOy3AZIT9x+rHbkWZV3f4lkG0gbGtCSw43ndxw/yURH2zDlP53VMvGsuj5AesT6yAWuLOl64kqyCmtI19F0WFtPbITP3zGPc85qc5A3dudrWK5hefYeiBY+OqEeYTviP2PRoXcHAwAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "myservice1-cicd-stack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "myservice1ecsfargateidLoadBalancerDNSA491572B": {
+   "Value": {
+    "Fn::GetAtt": [
+     "myservice1ecsfargateidLB7C17168C",
+     "DNSName"
+    ]
+   }
+  },
+  "myservice1ecsfargateidServiceURLBA4E1B10": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "myservice1ecsfargateidLB7C17168C",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   }
+  },
+  "myservice1prodecsfargateidLoadBalancerDNS87E1A693": {
+   "Value": {
+    "Fn::GetAtt": [
+     "myservice1prodecsfargateidLB71DBBE0F",
+     "DNSName"
+    ]
+   }
+  },
+  "myservice1prodecsfargateidServiceURL0351EFAA": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "myservice1prodecsfargateidLB71DBBE0F",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ }
+}

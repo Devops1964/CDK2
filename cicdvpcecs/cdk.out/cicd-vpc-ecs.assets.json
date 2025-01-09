@@ -1,0 +1,20 @@
+{
+  "version": "39.0.0",
+  "files": {
+    "5d40469b236befef0f8e8b9c56bab4204cb1727e0e4fdfd4d0d7446f15957e91": {
+      "source": {
+        "path": "cicd-vpc-ecs.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "529088253053-eu-central-1": {
+          "bucketName": "cdk-hnb659fds-assets-529088253053-eu-central-1",
+          "objectKey": "5d40469b236befef0f8e8b9c56bab4204cb1727e0e4fdfd4d0d7446f15957e91.json",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::529088253053:role/cdk-hnb659fds-file-publishing-role-529088253053-eu-central-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

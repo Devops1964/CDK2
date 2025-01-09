@@ -1,0 +1,412 @@
+{
+  "version": "39.0.0",
+  "artifacts": {
+    "my-microservice-cicd-stack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "my-microservice-cicd-stack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "my-microservice-cicd-stack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://529088253053/eu-central-1",
+      "properties": {
+        "templateFile": "my-microservice-cicd-stack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::529088253053:role/cdk-hnb659fds-deploy-role-529088253053-eu-central-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::529088253053:role/cdk-hnb659fds-cfn-exec-role-529088253053-eu-central-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-529088253053-eu-central-1/875dddd00c122b42de48026fa1682d53ae13b79dfd1ac75f66c0d403a6ac77d8.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "my-microservice-cicd-stack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::529088253053:role/cdk-hnb659fds-lookup-role-529088253053-eu-central-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "my-microservice-cicd-stack.assets"
+      ],
+      "metadata": {
+        "/my-microservice-cicd-stack/my-microservice-ecrrepo-id/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecrrepoid7980A577"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecsrole-id/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsroleid6C4A1C83"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecsrole-id/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsroleidDefaultPolicy9CD2A00D"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-codebuild-id/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicecodebuildidRole8DD6BA2A"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-codebuild-id/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicecodebuildidRoleDefaultPolicy0E920B00"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-codebuild-id/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicecodebuildid9FB71BDB"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLB5B8CC3A8"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLBSecurityGroupAF0D9346"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/SecurityGroup/to mymicroservicecicdstackmymicroserviceecsfargateidServiceSecurityGroup4C93B9D6:80": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLBSecurityGrouptomymicroservicecicdstackmymicroserviceecsfargateidServiceSecurityGroup4C93B9D6809F11DA30"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/PublicListener/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLBPublicListener5AE36A85"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LB/PublicListener/ECSGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLBPublicListenerECSGroupBC95D56F"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/LoadBalancerDNS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidLoadBalancerDNSCA4A542A"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/ServiceURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidServiceURL823C04E9"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/TaskRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidTaskDefTaskRole31448546"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidTaskDefBA75F74D"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/TaskDef/app/LogGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidTaskDefappLogGroup17DB017E"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/Service": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidService69DF2BEA"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidServiceSecurityGroup017DE029"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-ecs-fargate-id/Service/SecurityGroup/from mymicroservicecicdstackmymicroserviceecsfargateidLBSecurityGroup060EDAC1:80": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroserviceecsfargateidServiceSecurityGroupfrommymicroservicecicdstackmymicroserviceecsfargateidLBSecurityGroup060EDAC180E47B3296"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYN926A5246"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpc7788A521"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1Subnet3C273B99"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableA1FD6ACC"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1RouteTableAssociation8B583A17"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1DefaultRouteFF4E2178"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1EIP8704DB2F"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet1/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet1NATGateway5E3732C1"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2Subnet95FF715A"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTable263DEAA5"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2RouteTableAssociation43E5803C"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2DefaultRouteB1375520"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2EIPF0764873"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PublicSubnet2/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPublicSubnet2NATGateway4C855E00"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1Subnet075EFF4C"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTable4F1D2E36"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1RouteTableAssociation34B92275"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet1DefaultRouteA5ADF694"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2SubnetE4CEDF73"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableDCE46591"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2RouteTableAssociation111C622F"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/PrivateSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcPrivateSubnet2DefaultRoute20CE2D89"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcIGW9C2C2B8F"
+          }
+        ],
+        "/my-microservice-cicd-stack/EcsDefaultClusterMnL3mNNYN/Vpc/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EcsDefaultClusterMnL3mNNYNVpcVPCGW2447264E"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "V1 pipeline type is implicitly selected when `pipelineType` is not set. If you want to use V2 type, set `PipelineType.V2`. [ack: @aws-cdk/aws-codepipeline:unspecifiedPipelineType]",
+            "trace": [
+              "Annotations.addMessage (C:\\Users\\imado\\AppData\\Local\\Temp\\jsii-kernel-SwkeJJ\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:1608)",
+              "Annotations.addWarningV2 (C:\\Users\\imado\\AppData\\Local\\Temp\\jsii-kernel-SwkeJJ\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:825)",
+              "new Pipeline (C:\\Users\\imado\\AppData\\Local\\Temp\\jsii-kernel-SwkeJJ\\node_modules\\aws-cdk-lib\\aws-codepipeline\\lib\\pipeline.js:1:6677)",
+              "Kernel._Kernel_create (C:\\Users\\imado\\AppData\\Local\\Temp\\tmpwqtymsjt\\lib\\program.js:9128:25)",
+              "Kernel.create (C:\\Users\\imado\\AppData\\Local\\Temp\\tmpwqtymsjt\\lib\\program.js:8798:93)",
+              "KernelHost.processRequest (C:\\Users\\imado\\AppData\\Local\\Temp\\tmpwqtymsjt\\lib\\program.js:10718:36)",
+              "KernelHost.run (C:\\Users\\imado\\AppData\\Local\\Temp\\tmpwqtymsjt\\lib\\program.js:10678:22)",
+              "Immediate._onImmediate (C:\\Users\\imado\\AppData\\Local\\Temp\\tmpwqtymsjt\\lib\\program.js:10679:46)",
+              "process.processImmediate (node:internal/timers:491:21)"
+            ]
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucketEncryptionKey/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidArtifactsBucketEncryptionKey831A4B7B"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucketEncryptionKeyAlias/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidArtifactsBucketEncryptionKeyAlias887F0C32"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidArtifactsBucket5C7ADC78"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/ArtifactsBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidArtifactsBucketPolicyB26455EC"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidRoleDDC25B2C"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidRoleDefaultPolicy0E7EBA24"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineid1FE405DC"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Source/GitHub_Source/WebhookResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidSourceGitHubSourceWebhookResource2C77FA34"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Build/CodeBuild/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRole7DC0421C"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Build/CodeBuild/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidBuildCodeBuildCodePipelineActionRoleDefaultPolicy5A027787"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Deploy/ECS_Deploy/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidDeployECSDeployCodePipelineActionRole1E321133"
+          }
+        ],
+        "/my-microservice-cicd-stack/my-microservice-pipeline-id/Deploy/ECS_Deploy/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "mymicroservicepipelineidDeployECSDeployCodePipelineActionRoleDefaultPolicy68EEB709"
+          }
+        ],
+        "/my-microservice-cicd-stack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/my-microservice-cicd-stack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/my-microservice-cicd-stack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "my-microservice-cicd-stack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}
