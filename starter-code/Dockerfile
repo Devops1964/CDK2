@@ -7,6 +7,6 @@ COPY . .
 # build npm dependencies
 RUN npm install
 
-EXPOSE 80
+EXPOSE 8083
 
 CMD ["node", "index.js"]
